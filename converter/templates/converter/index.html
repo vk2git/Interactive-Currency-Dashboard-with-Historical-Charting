@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Dashboard</title>
+    <link rel="icon" type="image/png" href="{% static 'converter/img/favicon.png' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{% static 'converter/style.css' %}">
+</head>
+
+<body>
+    <button id="theme-toggle" class="theme-toggle">
+        <svg id="theme-icon-sun" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.95-4.243-1.591 1.591M5.25 12H3m4.243-4.95L6.343 6.343m5.657 5.657a3 3 0 1 0-5.657-5.657 3 3 0 0 0 5.657 5.657Z" /></svg>
+        <svg id="theme-icon-moon" class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" /></svg>
+    </button>
+
+    <div id="global-error-message" class="error-box hidden fixed top-5 left-1/2 -translate-x-1/2 z-50"></div>
+
+    <section id="converter-section" class="fullscreen-section">
+        <div class="content-card">
+            <h1 class="card-title">Currency Converter</h1>
+            <div class="converter-grid">
+                <div class="converter-inputs">
+                    <div id="error-message-converter" class="error-box hidden"></div>
+                    <div class="input-group">
+                        <label for="amount">Amount</label>
+                        <input type="number" id="amount" class="input-field" value="1">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="input-group">
+                            <label for="from_currency">From</label>
+                            <select id="from_currency" class="input-field"></select>
+                        </div>
+                        <div class="input-group">
+                            <label for="to_currency">To</label>
+                            <select id="to_currency" class="input-field"></select>
+                        </div>
+                    </div>
+                    <button id="convert-button" class="action-button mt-4">Convert</button>
+                </div>
+                <div id="result-container" class="result-container">
+                     <div id="result-display" class="result-display hidden">
+                        <p id="result-text"></p>
+                        <p id="rate-info"></p>
+                     </div>
+                </div>
+            </div>
+            <div class="scroll-button-wrapper">
+                <a href="#graph-section" class="scroll-button">
+                    <span class="button-text">View Graphs</span>
+                    <span class="button-icon hidden text-2xl">↓</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="graph-section" class="fullscreen-section">
+        <div class="content-card-large">
+            <h1 class="card-title">Comparative Analysis</h1>
+            <div class="graph-grid-container">
+                <div id="graph-container">
+                    <canvas id="historical-chart"></canvas>
+                </div>
+                <div class="graph-sidebar">
+                    <div id="error-message-graph" class="error-box hidden"></div>
+                    <div class="input-group">
+                        <label for="historical_currency">Currency</label>
+                        <select id="historical_currency" class="input-field"></select>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="add-to-graph-button" class="action-button">Add</button>
+                        <button id="clear-graph-button" class="action-button-secondary">Clear</button>
+                    </div>
+                    <hr class="my-4 border-t border-gray-200 dark:border-gray-700">
+                    <div id="plotted-currencies-container"></div>
+                </div>
+            </div>
+            <div class="scroll-button-wrapper">
+                 <a href="#converter-section" class="scroll-button scroll-up-link">
+                    <span class="button-text">Back to Converter</span>
+                    <span class="button-icon hidden text-2xl">↑</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {{ all_currencies|json_script:"all-currency-data" }}
+    {{ graph_currencies|json_script:"graph-currency-data" }}
+    <script id="api-urls" type="application/json">{
+        "get_rates": "{% url 'get-rates' %}",
+        "get_historical": "{% url 'get-historical-rates' %}"
+    }</script>
+    <script src="{% static 'converter/script.js' %}"></script>
+</body>
+</html>
